@@ -1,0 +1,131 @@
+---
+import Base from '../layouts/Base.astro';
+import { contact } from '../data/contact';
+import { concepts } from '../data/harness';
+import { icon } from '../scripts/agent-hq/ui/pixels';
+import '../styles/agent-hq.css';
+---
+
+<Base
+  title="Sergio Lozano — Senior Frontend Engineer"
+  description="Senior Frontend Engineer (React, TypeScript). Leads the payments frontend of Mango's checkout, used by 20M+ customers in 110+ countries. Founder of Referent Software. Explore it in Agent HQ, a small pixel-art game about how an AI agent harness works."
+  viewportFit="cover"
+>
+  <Fragment slot="head">
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </Fragment>
+
+  <main class="hq" id="hq" data-screen="title">
+    <!-- The same story in plain HTML, for search engines, screen readers and browsers without JavaScript. -->
+    <div class="hq-static">
+      <h1>Sergio Lozano, Senior Frontend Engineer</h1>
+      <p>
+        React and TypeScript. Leads the payments frontend of Mango's checkout, used by 20M+ customers in 110+ countries.
+        Founder of Referent Software.
+      </p>
+      <p><a href="/experience/">Read the full experience</a></p>
+      <ul>
+        {
+          contact.map((c) => (
+            <li>
+              {c.name}: <a href={c.href} rel={c.href.startsWith('http') ? 'me noopener' : undefined}>{c.text}</a>
+            </li>
+          ))
+        }
+      </ul>
+      <h2>Agent HQ</h2>
+      <p>
+        A small pixel-art game: spend your first day as the operator of an office run by nine AI agents, learn how an agent
+        harness works and uncover Sergio's career along the way. The missions and everything in them are fictional.
+      </p>
+      <ol>
+        {
+          concepts.map((c) => (
+            <li>
+              <b>{c.title}.</b> {c.summary}
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="hq-stage" id="hq-stage" tabindex="0" aria-label="Agent HQ, a game. Arrow keys or WASD to move, E or Space to talk, M to mute, Escape for the menu.">
+      <canvas id="hq-canvas" aria-hidden="true"></canvas>
+
+      <div class="hq-overlay">
+        <header class="hq-hud">
+          <div class="hq-quest" id="hq-quest">
+            <p class="lvl"><span class="sr-only">Level: </span><span id="hq-level">Intern</span></p>
+            <p class="obj"><Fragment set:html={icon('alert')} /><span id="hq-objective"></span></p>
+            <div class="tokens" id="hq-tokens" hidden>
+              <span class="meter" id="hq-meter"><i></i></span>
+              <span id="hq-tokens-label"></span>
+            </div>
+          </div>
+          <nav class="hq-menu" aria-label="Game">
+            <button type="button" class="btn" data-open="goto" title="Go to">
+              <Fragment set:html={icon('pin')} /><span class="lbl">Go to</span>
+            </button>
+            <button type="button" class="btn" data-open="dex" title="Agentdex">
+              <Fragment set:html={icon('cards')} /><span class="lbl">Agentdex</span><span class="count" id="hq-dex-count">0/9</span>
+            </button>
+            <a class="btn gold" href="/experience/"><Fragment set:html={icon('case')} /><span>Experience</span></a>
+            <button type="button" class="btn hq-sound" id="hq-sound" aria-pressed="true" title="Mute (M)">
+              <Fragment set:html={icon('sound', 'on')} /><Fragment set:html={icon('mute', 'off')} /><span class="lbl">Sound</span>
+            </button>
+            <button type="button" class="btn" data-open="menu" title="Menu (Esc)">
+              <Fragment set:html={icon('menu')} /><span class="lbl">Menu</span>
+            </button>
+          </nav>
+        </header>
+
+        <div class="hq-toast" id="hq-toast" role="status"></div>
+        <div class="hq-spacer"></div>
+
+        <button type="button" class="btn hq-action" id="hq-action" hidden><kbd>E</kbd><span data-label></span></button>
+
+        <!-- the dialog: the speaker's splash art standing behind a box with a tab on its edge -->
+        <div class="hq-talk" id="hq-dialog" hidden>
+          <canvas class="splash" aria-hidden="true"></canvas>
+          <div class="hq-box">
+            <div class="tab"><span class="badge" data-badge></span><span class="tab-title" data-who></span><span class="dots" aria-hidden="true"></span></div>
+            <p class="line" data-line aria-hidden="true"></p>
+            <p class="sr-only" data-live aria-live="polite"></p>
+            <span class="next" aria-hidden="true">Next<Fragment set:html={icon('right')} /></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- the title screen: Herbie between the two ways in, the experience and the game -->
+      <section class="hq-title" id="hq-title" aria-labelledby="hq-title-name">
+        <div class="name">
+          <p id="hq-title-name">Sergio Lozano</p>
+          <p class="role">Senior Frontend Engineer</p>
+        </div>
+        <a class="btn gold choice experience" href="/experience/" data-mood="happy">
+          <Fragment set:html={icon('briefcase')} />
+          <span class="label">Experience</span>
+          <span class="hint">Read the CV in a minute</span>
+        </a>
+        <div class="herbie"><canvas class="splash" aria-hidden="true"></canvas></div>
+        <button type="button" class="btn choice play" id="hq-play" data-mood="proud">
+          <Fragment set:html={icon('gamepad')} />
+          <span class="label" data-label>Play</span>
+          <span class="hint">Discover it in a game</span>
+        </button>
+      </section>
+
+      <div class="hq-sheet" id="hq-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="hq-sheet-title">
+        <div class="hq-card hq-box" tabindex="-1">
+          <div class="tab"><span class="badge" data-badge></span><span class="tab-title" data-title></span><span class="dots" aria-hidden="true"></span></div>
+          <button type="button" class="btn x" data-dismiss aria-label="Close"><Fragment set:html={icon('close')} /></button>
+          <div class="hq-body"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</Base>
+
+<script>
+  import '../scripts/agent-hq/main.ts';
+</script>

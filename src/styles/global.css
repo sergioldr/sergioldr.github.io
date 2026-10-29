@@ -1,0 +1,328 @@
+/*
+ * The pixel interface every page shares, drawn like the plaques on the office walls of
+ * Agent HQ. Colours, frames, the cursor and CSS icons are `--hq-*` properties from
+ * ui/pixels.ts, inlined by Base.astro. `--px` is one pixel of the interface: fixed here,
+ * set by main.ts in the game so it scales with the office. agent-hq.css adds the game.
+ *
+ * Frames are nine-slice images that cut 2 pixels a side. No rounded corners, blur or
+ * soft shadows anywhere.
+ */
+
+:root {
+  --px: 3px;
+  color-scheme: dark;
+}
+@media (max-width: 640px) {
+  :root {
+    --px: 2px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-color: var(--hq-gold) var(--hq-plaque-shade);
+}
+
+body {
+  margin: 0;
+  background: var(--hq-void);
+  color: var(--hq-cream);
+  font-family: 'Pixelify Sans Variable', ui-monospace, monospace;
+}
+
+a {
+  color: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hq {
+  --gut: max(10px, calc(var(--px) * 4));
+  --text: clamp(15px, calc(var(--px) * 6), 26px);
+  min-height: 100vh;
+  background: var(--hq-void);
+  color: var(--hq-cream);
+  font-family: 'Pixelify Sans Variable', ui-monospace, monospace;
+  font-size: var(--text);
+  line-height: 1.35;
+}
+
+/* ---------- shared bits ---------- */
+.hq [hidden] {
+  display: none !important;
+}
+.hq p {
+  margin: 0;
+}
+.hq .muted {
+  color: var(--hq-cream-dim);
+}
+.hq .small {
+  font-size: 0.85em;
+}
+.hq .kicker {
+  margin: 0 0 var(--px);
+  color: var(--hq-cream-dim);
+  font-size: 0.8em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.hq :focus-visible {
+  outline: var(--px) solid var(--hq-gold);
+  outline-offset: var(--px);
+}
+.px-icon {
+  flex: none;
+  width: calc(var(--px) * var(--w));
+  height: calc(var(--px) * var(--h));
+}
+
+/* buttons: a raised plaque that sinks a pixel when pressed */
+.hq .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--px) * 2);
+  min-height: 44px;
+  padding: 0 calc(var(--px) * 3);
+  border: calc(var(--px) * 2) solid transparent;
+  border-image: var(--hq-frame-button) 2 fill / calc(var(--px) * 2);
+  background: none;
+  color: var(--hq-cream);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.hq .btn:hover {
+  filter: brightness(1.25);
+}
+.hq .btn:active {
+  border-image-source: var(--hq-frame-pressed);
+  transform: translateY(var(--px));
+  filter: none;
+}
+.hq .btn.gold,
+.hq .btn.primary {
+  border-image-source: var(--hq-frame-gold);
+  color: var(--hq-ink);
+}
+.hq .btn.gold:hover,
+.hq .btn.primary:hover {
+  filter: brightness(1.08);
+}
+.hq .btn.gold:active,
+.hq .btn.primary:active {
+  border-image-source: var(--hq-frame-gold-pressed);
+}
+.hq .btn.gold:focus-visible,
+.hq .btn.primary:focus-visible {
+  outline-color: var(--hq-cream);
+}
+.hq .btn.danger {
+  border-image-source: var(--hq-frame-red);
+  color: var(--hq-cream);
+}
+.hq .actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--px) * 3);
+  margin-top: calc(var(--px) * 5);
+}
+.hq .actions.end {
+  justify-content: flex-end;
+}
+
+/* ---------- windows: a dark box with an old-gold edge and a tab on top ---------- */
+.hq-box {
+  position: relative;
+  border: calc(var(--px) * 2) solid transparent;
+  border-image: var(--hq-frame-box) 2 / calc(var(--px) * 2);
+  background: linear-gradient(var(--hq-box-top), var(--hq-plaque)) padding-box;
+}
+/* the tab sits across the top edge: a yellow tag, the title and a dotted leader */
+.hq-box > .tab {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--px) * -1);
+  left: calc(var(--px) * 6);
+  max-width: calc(100% - var(--px) * 12);
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 3);
+  padding: calc(var(--px) * 1.5) calc(var(--px) * 3) calc(var(--px) * 1.5) calc(var(--px) * 1.5);
+  border: calc(var(--px) * 2) solid transparent;
+  border-image: var(--hq-frame-box) 2 / calc(var(--px) * 2);
+  background: var(--hq-box-top) padding-box;
+  color: var(--hq-gold);
+  font-family: 'Press Start 2P', 'Pixelify Sans Variable', monospace;
+  font-size: max(10px, calc(var(--px) * 4));
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.hq-box > .tab h2 {
+  margin: 0;
+  overflow: hidden;
+  font: inherit;
+  text-overflow: ellipsis;
+}
+.hq-box > .tab .tab-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hq-box .badge {
+  flex: none;
+  padding: var(--px) calc(var(--px) * 1.5);
+  background: var(--hq-gold);
+  box-shadow:
+    0 0 0 var(--px) var(--hq-ink),
+    var(--px) var(--px) 0 var(--px) var(--hq-ink);
+  color: var(--hq-ink);
+}
+.hq-box .badge:empty {
+  display: none;
+}
+.hq-box .dots {
+  flex: none;
+  width: calc(var(--px) * 24);
+  height: var(--px);
+  background: repeating-linear-gradient(90deg, var(--hq-gold-dim) 0 var(--px), transparent 0 calc(var(--px) * 3));
+}
+@media (max-width: 640px) {
+  .hq-box .dots {
+    display: none;
+  }
+}
+
+@keyframes hq-open {
+  from {
+    transform: scaleY(0.3);
+  }
+}
+
+/* ---------- paper: documents from the Archive ---------- */
+.hq .doc,
+.hq .block {
+  margin-top: calc(var(--px) * 3);
+  padding: calc(var(--px) * 3) calc(var(--px) * 4);
+  border: calc(var(--px) * 2) solid transparent;
+  border-image: var(--hq-frame-paper) 2 fill / calc(var(--px) * 2);
+  color: var(--hq-ink);
+}
+.hq .doc .muted,
+.hq .block .muted {
+  color: var(--hq-paper-ink);
+}
+.hq .doc h3,
+.hq .block h3 {
+  margin-top: 0;
+}
+.hq .block .kicker {
+  color: var(--hq-paper-ink);
+}
+.hq .block.real {
+  border-image-source: var(--hq-frame-chosen);
+}
+.hq blockquote {
+  margin: calc(var(--px) * 2) 0;
+  padding-left: calc(var(--px) * 3);
+  border-left: var(--px) solid var(--hq-ink);
+}
+
+/* a list of achievements, square bullets; the ones a mission points at get a gold arrow */
+.hq .points {
+  display: grid;
+  gap: calc(var(--px) * 2);
+  margin: calc(var(--px) * 3) 0;
+  padding: 0;
+  list-style: none;
+}
+.hq .points li {
+  position: relative;
+  padding-left: calc(var(--px) * 5);
+}
+.hq .points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: calc(var(--px) * 2);
+  height: calc(var(--px) * 2);
+  background: var(--hq-ink);
+}
+.hq .points li.linked {
+  padding: calc(var(--px) * 2) calc(var(--px) * 3) calc(var(--px) * 2) calc(var(--px) * 7);
+  background: color-mix(in srgb, var(--hq-gold) 35%, var(--hq-paper));
+  box-shadow: inset var(--px) 0 0 var(--hq-gold-shade);
+}
+.hq .points li.linked::before {
+  left: calc(var(--px) * 3);
+  top: calc(var(--px) * 2 + 0.3em);
+  width: calc(var(--px) * 3);
+  height: calc(var(--px) * 5);
+  background: var(--hq-gold-ink);
+  -webkit-mask: var(--hq-icon-right) center / contain no-repeat;
+  mask: var(--hq-icon-right) center / contain no-repeat;
+}
+.hq .tag {
+  display: block;
+  margin-top: var(--px);
+  color: var(--hq-gold-ink);
+  font-size: 0.85em;
+  font-weight: 700;
+}
+/* the stack: ink chips */
+.hq .stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--px) * 2);
+}
+.hq .stack span {
+  padding: 0 calc(var(--px) * 2);
+  background: var(--hq-ink);
+  color: var(--hq-cream);
+  font-size: 0.85em;
+}
+.hq .facts {
+  display: grid;
+  gap: calc(var(--px) * 3);
+  margin: calc(var(--px) * 2) 0;
+  padding: 0;
+  list-style: none;
+}
+.hq .facts li {
+  display: grid;
+  gap: 2px;
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,334 @@
+---
+import Base from '../layouts/Base.astro';
+import { roles, education, languages } from '../data/experience';
+import { icon } from '../scripts/agent-hq/ui/pixels';
+
+// the Education tab shows the year it began, like its display case in the Archive
+const since = Math.min(...education.map((e) => Number(e.years.slice(0, 4))));
+
+// "Ask your AI" opens the visitor's own assistant with a prompt that has it read this page as Markdown
+const record = new URL('/experience.md', Astro.site).href;
+const prompt = `Read ${record}, the professional record of Sergio Lozano del Río, a senior frontend engineer. Sum him up in three lines, then answer my questions using only that record, and tell me when it doesn't cover something.`;
+const assistants = [
+  { name: 'Claude', href: `https://claude.ai/new?q=${encodeURIComponent(prompt)}` },
+  { name: 'ChatGPT', href: `https://chatgpt.com/?q=${encodeURIComponent(prompt)}` },
+];
+---
+
+<Base
+  title="Experience — Sergio Lozano"
+  description="Eight years building with React. Payments at Mango, founder of Referent Software, and earlier work at Telefónica, Nutrilieve and as a freelancer."
+>
+  <main class="hq cv">
+    <nav class="top" aria-label="Site">
+      <a class="btn" href="/"><Fragment set:html={icon('left')} /><span>Back</span></a>
+    </nav>
+
+    <header class="intro">
+      <p class="kicker">Experience</p>
+      <p class="name">Sergio Lozano del Río</p>
+      <h1>8+ years of React</h1>
+      <p class="muted">Senior Frontend Engineer · React, TypeScript, Payments</p>
+      <div class="actions">
+        <a class="btn gold" href="/sergio-lozano-cv.pdf" download="Sergio_Lozano_CV.pdf">
+          <Fragment set:html={icon('download')} /><span>Download CV</span>
+        </a>
+        <!-- a menu without JavaScript: the summary is the button, the choices drop below it -->
+        <details class="ask">
+          <summary class="btn">
+            <Fragment set:html={icon('chat')} /><span>Ask your AI</span><Fragment set:html={icon('down', 'caret')} />
+          </summary>
+          <div class="menu">
+            <p class="muted small">Your assistant reads my record and answers your questions about it.</p>
+            {
+              assistants.map((a) => (
+                <a class="btn" href={a.href} target="_blank" rel="noopener">
+                  <span>{a.name}</span>
+                  <Fragment set:html={icon('right')} />
+                </a>
+              ))
+            }
+          </div>
+        </details>
+      </div>
+    </header>
+
+    <!-- each role is a window like its display case in the Archive: the year and the company on the tab, the record on paper -->
+    {
+      roles.map((r) => (
+        <article class="hq-box" aria-labelledby={`role-${r.id}`}>
+          <div class="tab">
+            <span class="badge">{r.since}</span>
+            <h2 class="tab-title" id={`role-${r.id}`}>{r.short}</h2>
+            <span class="dots" aria-hidden="true"></span>
+          </div>
+          <h3>{r.title}</h3>
+          <p class="muted">
+            {r.company} · {r.period} · {r.place}
+          </p>
+          <div class="doc">
+            <ul class="points">
+              {r.points.map((p) => (
+                <li>{p}</li>
+              ))}
+            </ul>
+            <p class="stack">
+              {r.stack.map((s) => (
+                <span>{s}</span>
+              ))}
+            </p>
+          </div>
+        </article>
+      ))
+    }
+
+    <div class="pair">
+      <section class="hq-box" aria-labelledby="education">
+        <div class="tab">
+          <span class="badge">{since}</span>
+          <h2 class="tab-title" id="education">Education</h2>
+          <span class="dots" aria-hidden="true"></span>
+        </div>
+        <div class="doc">
+          <ul class="facts">
+            {
+              education.map((e) => (
+                <li>
+                  <b>{e.degree}</b>
+                  <span class="muted">
+                    {e.school} · {e.years}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </section>
+      <section class="hq-box" aria-labelledby="languages">
+        <div class="tab">
+          <h2 class="tab-title" id="languages">Languages</h2>
+          <span class="dots" aria-hidden="true"></span>
+        </div>
+        <div class="doc">
+          <ul class="facts">
+            {
+              languages.map((l) => (
+                <li>
+                  <b>{l.name}</b>
+                  <span class="muted">{l.level}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <footer class="actions">
+      <a class="btn gold" href="/"><Fragment set:html={icon('left')} /><span>Back to Agent HQ</span></a>
+    </footer>
+
+    <!-- once per visitor, H.E.R.B.I.E. offers the same choices from a game window; scripts/experience.ts opens it -->
+    <dialog class="ask-ai" id="ask-ai" aria-labelledby="ask-ai-title" aria-describedby="ask-ai-line">
+      <canvas class="splash" aria-hidden="true"></canvas>
+      <form class="hq-box" method="dialog">
+        <div class="tab">
+          <span class="badge">New</span>
+          <h2 class="tab-title" id="ask-ai-title">Ask your AI</h2>
+          <span class="dots" aria-hidden="true"></span>
+        </div>
+        <button class="btn x" aria-label="Close"><Fragment set:html={icon('close')} /></button>
+        <p class="line" id="ask-ai-line">
+          Rather not read it all? Ask <em class="hl">your own AI</em> about Sergio. It reads his record and answers whatever you
+          want to know.
+        </p>
+        <div class="actions">
+          {
+            assistants.map((a) => (
+              <a class="btn gold" href={a.href} target="_blank" rel="noopener">
+                <span>Ask {a.name}</span>
+                <Fragment set:html={icon('right')} />
+              </a>
+            ))
+          }
+          <button class="btn">I'll read it</button>
+        </div>
+      </form>
+    </dialog>
+  </main>
+</Base>
+
+<script>
+  import '../scripts/experience.ts';
+</script>
+
+<style>
+  /* one column of windows, with room between them for the tabs that stick out on top */
+  .cv {
+    display: grid;
+    align-content: start;
+    gap: calc(var(--px) * 12);
+    width: min(100%, calc(var(--px) * 320 + var(--gut) * 2));
+    margin: 0 auto;
+    padding: 0 max(var(--gut), env(safe-area-inset-right)) calc(var(--px) * 16) max(var(--gut), env(safe-area-inset-left));
+  }
+
+  /* the way back stays at hand while scrolling, like the HUD in the game */
+  .cv .top {
+    position: sticky;
+    z-index: 4;
+    top: 0;
+    padding-top: max(var(--gut), env(safe-area-inset-top));
+    padding-bottom: var(--gut);
+    margin-bottom: calc(var(--px) * -8);
+    background: var(--hq-void);
+  }
+
+  .cv .intro {
+    display: grid;
+    gap: calc(var(--px) * 2);
+  }
+  /* the name as on the title screen: gold capitals with an ink shadow */
+  .cv .name {
+    color: var(--hq-gold);
+    font-family: 'Press Start 2P', 'Pixelify Sans Variable', monospace;
+    font-size: max(16px, calc(var(--px) * 9));
+    line-height: 1.3;
+    text-transform: uppercase;
+    text-shadow: var(--px) var(--px) 0 var(--hq-ink);
+  }
+  .cv h1 {
+    margin: calc(var(--px) * 2) 0 0;
+    font-size: calc(var(--px) * 16);
+    font-weight: 700;
+    line-height: 1.05;
+  }
+
+  .cv .intro .actions {
+    margin-top: calc(var(--px) * 4);
+  }
+
+  /* Ask your AI: a plaque button whose choices open in a small window under it */
+  .cv .ask {
+    position: relative;
+  }
+  .cv .ask summary {
+    list-style: none;
+  }
+  .cv .ask summary::-webkit-details-marker {
+    display: none;
+  }
+  /* the icons come in through set:html, outside the page's scoped styles */
+  .cv .ask[open] :global(.caret) {
+    transform: rotate(180deg);
+  }
+  /* above the windows' tabs, below the sticky way back */
+  .cv .ask .menu {
+    position: absolute;
+    z-index: 3;
+    top: calc(100% + var(--px) * 2);
+    left: 0;
+    display: grid;
+    gap: calc(var(--px) * 2);
+    width: max-content;
+    max-width: min(calc(var(--px) * 110), calc(100vw - var(--gut) * 2));
+    padding: calc(var(--px) * 4);
+    border: calc(var(--px) * 2) solid transparent;
+    border-image: var(--hq-frame-box) 2 / calc(var(--px) * 2);
+    background: linear-gradient(var(--hq-box-top), var(--hq-plaque)) padding-box;
+    transform-origin: top;
+    animation: hq-open 0.15s steps(3);
+  }
+  .cv .ask .menu p {
+    white-space: normal;
+  }
+  .cv .ask .menu .btn {
+    justify-content: space-between;
+  }
+
+  /* the announcement: a game window over the dithered page, with Herbie standing behind it
+     and cut off at the waist, as in the game's dialog */
+  .ask-ai {
+    --splash: calc(var(--px) * 2);
+    width: min(100% - var(--gut) * 2, calc(var(--px) * 200));
+    max-width: none;
+    max-height: none;
+    /* room above the box for the 34 rows of Herbie that show */
+    padding: calc(var(--splash) * 34) 0 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    overflow: visible;
+  }
+  .ask-ai::backdrop {
+    background: repeating-conic-gradient(rgb(23 18 28 / 0.8) 0 25%, rgb(23 18 28 / 0.45) 0 50%) 0 0 / calc(var(--px) * 2)
+      calc(var(--px) * 2);
+  }
+  .ask-ai .splash {
+    position: absolute;
+    top: 0;
+    right: 8%;
+    width: calc(var(--splash) * 32);
+    height: calc(var(--splash) * 45);
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+  .ask-ai .hq-box {
+    z-index: 1;
+    margin: 0;
+  }
+  .ask-ai .x.btn {
+    position: absolute;
+    top: calc(var(--px) * 2);
+    right: calc(var(--px) * 2);
+    min-width: 44px;
+    padding: 0;
+  }
+  /* clear of the close button on the right */
+  .ask-ai .line {
+    padding-right: calc(44px + var(--px) * 2);
+    font-family: 'Press Start 2P', 'Pixelify Sans Variable', monospace;
+    font-size: max(11px, calc(var(--px) * 5));
+    line-height: 1.75;
+  }
+  .ask-ai .hl {
+    color: var(--hq-gold);
+    font-style: normal;
+  }
+
+  .cv .hq-box {
+    padding: calc(var(--px) * 10) calc(var(--px) * 6) calc(var(--px) * 6);
+    animation: hq-open 0.15s steps(3);
+  }
+  .cv h3 {
+    margin: 0 0 var(--px);
+    font-size: 1.25em;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .cv .doc {
+    margin-top: calc(var(--px) * 4);
+  }
+  .cv .doc > :first-child {
+    margin-top: 0;
+  }
+  .cv .doc > :last-child {
+    margin-bottom: 0;
+  }
+
+  .cv .pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+    gap: calc(var(--px) * 12) calc(var(--px) * 6);
+  }
+
+  .cv .actions {
+    margin-top: 0;
+  }
+
+  @media (max-width: 640px) {
+    .cv .hq-box {
+      padding: calc(var(--px) * 9) calc(var(--px) * 3) calc(var(--px) * 4);
+    }
+  }
+</style>

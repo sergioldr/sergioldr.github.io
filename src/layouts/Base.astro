@@ -1,0 +1,40 @@
+---
+import '@fontsource-variable/pixelify-sans';
+import '@fontsource/press-start-2p';
+import '../styles/global.css';
+import { PALETTE, hqCss } from '../scripts/agent-hq/ui/pixels';
+
+interface Props {
+  title: string;
+  description: string;
+  /** `cover` lets a full-screen page draw under the notch and handle the safe areas itself. */
+  viewportFit?: 'auto' | 'cover';
+}
+
+const { title, description, viewportFit = 'auto' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const viewport = `width=device-width, initial-scale=1${viewportFit === 'cover' ? ', viewport-fit=cover' : ''}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content={viewport} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content={PALETTE.void} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <!-- the pixel interface's palette, frames, icons and cursor, as --hq-* properties -->
+    <Fragment set:html={`<style>${hqCss()}</style>`} />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
